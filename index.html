@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="description" content="TARGETKU — tracker target, checklist, streak, kalender, statistik, dan fokus harian.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>TARGETKU</title>
+</head>
+<body>
+  <div id="splash" class="splash">
+    <div class="splash-card">
+      <div class="brand-mark">TK</div>
+      <div class="splash-title">TARGETKU</div>
+      <div class="splash-tagline">Sedikit demi sedikit, jadi konsisten.</div>
+      <div class="loader"><span></span></div>
+    </div>
+  </div>
+
+  <div id="onboarding" class="overlay hidden">
+    <div class="modal onboarding-card">
+      <div class="eyebrow">SETUP AWAL</div>
+      <h1>Mulai dengan targetmu.</h1>
+      <p>Atur dasar aplikasi. Semuanya bisa diubah nanti dari Profil.</p>
+      <form id="onboardingForm">
+        <label>Nama
+          <input id="obName" maxlength="40" placeholder="Namamu" autocomplete="name">
+        </label>
+        <label>Target utama
+          <input id="obGoal" maxlength="60" placeholder="Contoh: lebih konsisten setiap hari">
+        </label>
+        <div class="form-grid two">
+          <label>Jam bangun<input id="obWake" type="time" value="06:30"></label>
+          <label>Jam tidur<input id="obSleep" type="time" value="22:30"></label>
+        </div>
+        <label>Minimum progress untuk dihitung sebagai hari berhasil
+          <div class="range-row">
+            <input id="obThreshold" type="range" min="10" max="100" step="5" value="70">
+            <strong id="obThresholdValue">70%</strong>
+          </div>
+        </label>
+        <div class="starter-box">
+          <div class="starter-title">Paket target awal</div>
+          <div class="starter-options">
+            <label class="check-choice"><input type="checkbox" id="starterMeal" checked><span>Rutinitas makan & minum</span></label>
+            <label class="check-choice"><input type="checkbox" id="starterActivity" checked><span>Aktivitas & stretching</span></label>
+            <label class="check-choice"><input type="checkbox" id="starterRest" checked><span>Istirahat & malam</span></label>
+          </div>
+        </div>
+        <div class="onboarding-actions">
+          <button type="button" id="skipOnboarding" class="btn ghost">Lewati</button>
+          <button class="btn primary" type="submit">Mulai TARGETKU</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="app" class="app-shell hidden">
+    <header class="topbar">
+      <div class="brand-small"><span class="brand-dot">TK</span><span>TARGETKU</span></div>
+      <div class="top-actions">
+        <button id="notifyBtn" class="icon-btn" aria-label="Aktifkan notifikasi" title="Notifikasi">◉</button>
+        <button id="quickAddBtn" class="icon-btn" aria-label="Tambah target cepat" title="Tambah target">＋</button>
+      </div>
+    </header>
+
+    <main id="view" class="view" tabindex="-1"></main>
+
+    <nav class="bottom-nav" aria-label="Navigasi utama">
+      <button data-route="home" class="nav-item active"><span>⌂</span><small>Home</small></button>
+      <button data-route="targets" class="nav-item"><span>☑</span><small>Target</small></button>
+      <button data-route="calendar" class="nav-item"><span>▦</span><small>Kalender</small></button>
+      <button data-route="stats" class="nav-item"><span>⌁</span><small>Statistik</small></button>
+      <button data-route="profile" class="nav-item"><span>○</span><small>Profil</small></button>
+    </nav>
+  </div>
+
+  <div id="targetModal" class="overlay hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <div class="eyebrow" id="targetModalEyebrow">TARGET</div>
+          <h2 id="targetModalTitle">Tambah Target</h2>
+        </div>
+        <button id="closeTargetModal" class="icon-btn" aria-label="Tutup">×</button>
+      </div>
+      <form id="targetForm">
+        <input type="hidden" id="targetId">
+        <label>Nama target<input id="targetTitle" maxlength="80" required placeholder="Contoh: Stretching 10 menit"></label>
+        <div class="form-grid two">
+          <label>Kategori
+            <select id="targetCategory">
+              <option value="Kesehatan">Kesehatan</option>
+              <option value="Makan">Makan</option>
+              <option value="Olahraga">Olahraga</option>
+              <option value="Tidur">Tidur</option>
+              <option value="Belajar">Belajar</option>
+              <option value="Personal">Personal</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </label>
+          <label>Waktu<input id="targetTime" type="time"></label>
+        </div>
+        <label>Pengulangan
+          <select id="targetRecurrence">
+            <option value="daily">Setiap hari</option>
+            <option value="weekdays">Senin–Jumat</option>
+            <option value="weekly">Mingguan (pilih hari)</option>
+            <option value="custom">Custom</option>
+          </select>
+        </label>
+        <div id="weeklyDaysBox" class="hidden">
+          <div class="field-label">Hari yang dipilih</div>
+          <div class="weekday-grid">
+            <label><input type="checkbox" value="1"> Sen</label>
+            <label><input type="checkbox" value="2"> Sel</label>
+            <label><input type="checkbox" value="3"> Rab</label>
+            <label><input type="checkbox" value="4"> Kam</label>
+            <label><input type="checkbox" value="5"> Jum</label>
+            <label><input type="checkbox" value="6"> Sab</label>
+            <label><input type="checkbox" value="0"> Min</label>
+          </div>
+        </div>
+        <div id="customRecurrenceBox" class="hidden">
+          <div class="form-grid two">
+            <label>Setiap<input id="customEvery" type="number" min="1" max="30" value="2"></label>
+            <label>Satuan
+              <select id="customUnit"><option value="days">hari</option><option value="weeks">minggu</option></select>
+            </label>
+          </div>
+        </div>
+        <label>Pengingat
+          <select id="targetReminder">
+            <option value="off">Tidak ada</option>
+            <option value="atTime">Saat waktu target</option>
+            <option value="10m">10 menit sebelumnya</option>
+            <option value="30m">30 menit sebelumnya</option>
+          </select>
+        </label>
+        <label>Catatan (opsional)<textarea id="targetNote" maxlength="250" rows="3" placeholder="Catatan kecil untuk target ini…"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" id="cancelTarget" class="btn ghost">Batal</button>
+          <button type="submit" class="btn primary">Simpan Target</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="inputModal" class="overlay hidden">
+    <div class="modal compact">
+      <div class="eyebrow" id="inputModalEyebrow">EDIT</div>
+      <h2 id="inputModalTitle">Edit</h2>
+      <p id="inputModalDesc"></p>
+      <form id="inputModalForm">
+        <div id="inputModalFields" class="input-fields"></div>
+        <div class="modal-actions">
+          <button type="button" id="inputModalCancel" class="btn ghost">Batal</button>
+          <button type="submit" class="btn primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="overlay hidden">
+    <div class="modal compact">
+      <div class="eyebrow">KONFIRMASI</div>
+      <h2 id="confirmTitle">Yakin?</h2>
+      <p id="confirmMessage">Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="modal-actions">
+        <button id="confirmCancel" class="btn ghost">Batal</button>
+        <button id="confirmOk" class="btn danger">Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <template id="emptyTemplate">
+    <div class="empty-state">
+      <div class="empty-icon">✦</div>
+      <h3>Belum ada data</h3>
+      <p>Tambahkan target pertama untuk mulai membangun ritmemu.</p>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
